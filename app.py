@@ -35,20 +35,20 @@ def resolve_expenses(expenses: pl.DataFrame) -> None:
     for name, spent, cashflow in expenses.iter_rows():
         payers.append(Payer(name=name, spent=spent, cashflow=cashflow))
     payers.sort(key=lambda p: -p.cashflow)
-    rprint(payers)
 
     for payer in filter(lambda p: p.owes_money, payers):
         for recipient in filter(lambda p: p.is_owed_money, reversed(payers)):
             amount_exchanged = min(abs(payer.cashflow), abs(recipient.cashflow))
-            if round(amount_exchanged, PRECISION) == 0:
+            amount_exchanged = round(amount_exchanged, PRECISION)
+            if amount_exchanged == 0:
                 continue
             rprint(f"{payer.name} {amount_exchanged} -> {recipient.name}")
             payer.cashflow -= amount_exchanged
             recipient.cashflow += amount_exchanged
 
-    rprint("Final states:")
+    rprint("[blue]Final cashflow states:[/blue]")
     for payer in payers:
-        print(f"  {payer}")
+        print(f"  {payer.name}: {payer.cashflow:0,.4f}")
 
 
 def main() -> None:
